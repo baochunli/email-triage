@@ -1,12 +1,6 @@
 # Email Triage (Fastmail JMAP)
 
-Python automation for Fastmail email workflows using JMAP.
-
-This repository contains only the JMAP/Fastmail side of the email triage stack, with no AppleScript or Claude Code plugin code.
-
-## Why this exists
-
-The AppleScript layer is macOS + Mail.app specific. These scripts keep the same operational flow (fetch, triage, draft-only replies, delete/move) while running directly against Fastmail via JMAP.
+Python-powered automation for Fastmail email workflows using JMAP.
 
 ## Features
 
