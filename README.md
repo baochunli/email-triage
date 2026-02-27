@@ -2,7 +2,11 @@
 
 Python automation for Fastmail email workflows using JMAP.
 
-This repository contains the JMAP side of the email-triage stack with no AppleScript or Claude Code plugin files.
+This repository contains only the JMAP/Fastmail side of the email triage stack, with no AppleScript or Claude Code plugin code.
+
+## Why this exists
+
+The AppleScript layer is macOS + Mail.app specific. These scripts keep the same operational flow (fetch, triage, draft-only replies, delete/move) while running directly against Fastmail via JMAP.
 
 ## Features
 
@@ -11,18 +15,20 @@ This repository contains the JMAP side of the email-triage stack with no AppleSc
 - Create draft-only replies and follow-up drafts
 - Move/delete emails
 - Codex-powered triage with rule-based fallback
-- Stateful triage persistence with VIP senders and draft-block lists
-- One-shot triage/daemon loops with `daemon.py` and `run.sh`
+- Stateful triage persistence with VIP sender and draft-block lists
+- One-shot triage and daemon loops via `daemon.py` and `run.sh`
 
-## Getting Started
+## Requirements
 
-### 1) Install dependencies
+- uv (`brew install uv` or https://docs.astral.sh/uv/)
+- Python 3.10+
+- Fastmail API token with JMAP permissions
 
-```
-uv sync
-```
+Generate API token in Fastmail:
 
-### 2) Configure Fastmail access
+- Settings → Privacy & Security → Integrations → New API Token
+
+## Config
 
 Copy the example config:
 
@@ -33,29 +39,149 @@ cp examples/config.yaml.example ~/.config/email-triage/config.yaml
 
 Then set `fastmail.api_token` in that file or export `FASTMAIL_API_TOKEN`.
 
-### 3) Run a quick dry run
+Default config lookup order:
+
+1. `--config /path/to/config.yaml`
+2. `$EMAIL_TRIAGE_CONFIG`
+3. `~/.config/email-triage/config.yaml`
+4. `~/.config/email-triage/config.yml`
+5. `~/.config/email-triage/config.json`
+6. `~/.config/email-manager/config.yaml`
+7. `~/.config/email-manager/config.yml`
+8. `~/.config/email-manager/config.json`
+
+Use the template in `examples/config.yaml.example`.
+
+## Setup
+
+```bash
+# Install dependencies
+uv sync
+
+# Verify JMAP connectivity
+uv run scripts/get_mailboxes.py
+```
+
+## Codex setup (for intelligent triage)
+
+Recommended auth:
+
+```bash
+codex login
+```
+
+Optional API-key auth:
+
+```bash
+export OPENAI_API_KEY="your-key"
+```
+
+The triage pipeline uses `ai.backend: codex` and `ai.codex.model` from config.
+`ai.codex.reasoning_effort` can optionally set the model's reasoning effort.
+`ai.codex.auth_mode` defaults to `subscription`.
+Use `--no-codex` to force rule-only behavior.
+
+Canonical behavior reference: [`docs/jmap-automation-reference.md`](docs/jmap-automation-reference.md).
+
+## Primitive commands
 
 ```bash
 uv run scripts/get_mailboxes.py
-uv run scripts/fetch_emails.py "Fastmail" "INBOX" 5
+uv run scripts/fetch_emails.py "Fastmail" "INBOX" 10
+uv run scripts/fetch_all_emails.py "Fastmail" "INBOX" 50 7
+uv run scripts/fetch_email_by_id.py "Fastmail" "INBOX" "Mabc123"
+uv run scripts/fetch_sent.py "Fastmail" "Sent" 20
+uv run scripts/create_draft.py "Mabc123" "Thanks, I will send this Friday."
+uv run scripts/create_followup_draft.py "Just checking in" "person@example.com" "Re: Topic" "Original text" "2026-02-26"
+uv run scripts/delete_email.py "Fastmail" "INBOX" "Mabc123"
 ```
 
-### 4) Run triage
+Output marker compatibility is preserved:
+
+- `EMAIL_START` / `EMAIL_END`
+- `ID`, `SUBJECT`, `FROM`, `TO`, `DATE`, `CONTENT`
+- `fetch_all_emails.py` also emits `READ:true|false`
+
+This keeps existing parsing and instruction workflows compatible.
+
+## Automated triage pipeline
+
+Tiny launcher:
+
+```bash
+./scripts/run.sh           # one apply cycle (Codex)
+./scripts/run.sh dry       # one dry-run cycle
+./scripts/run.sh daemon    # continuous loop
+./scripts/run.sh rules     # rule-only apply cycle
+./scripts/run.sh reset-status # reset triage status to triaged
+```
+
+Dry-run one cycle (Codex triage, no drafts):
 
 ```bash
 uv run scripts/triage_cycle.py
+```
+
+Apply mode (Codex triage + auto-create drafts in Drafts mailbox):
+
+```bash
 uv run scripts/triage_cycle.py --apply
+```
+
+Continuous mode:
+
+```bash
+uv run scripts/triage_cycle.py --apply --loop-seconds 900
+# or
 uv run scripts/daemon.py
+./scripts/run.sh reset-status --state-db ~/.config/email-triage/triage.db
+```
+
+Rule-only fallback mode:
+
+```bash
+uv run scripts/triage_cycle.py --apply --no-codex
+```
+
+### VIP and draft-block management
+
+VIP senders are managed through the triage DB:
+
+```bash
+uv run scripts/triage_cycle.py --vip-list
+uv run scripts/triage_cycle.py --vip-add "your-boss@example.com" --vip-add "client-alert@example.com"
+uv run scripts/triage_cycle.py --vip-remove "old-contact@example.com"
+uv run scripts/triage_cycle.py --state-db ~/.config/email-triage/triage.db --vip-list
+```
+
+Draft suppression list commands:
+
+```bash
+uv run scripts/triage_cycle.py --draft-block-list
+uv run scripts/triage_cycle.py --draft-block-add "noreply@example.com" --draft-block-add "alerts@example.com"
+uv run scripts/triage_cycle.py --draft-block-remove "alerts@example.com"
+uv run scripts/triage_cycle.py --state-db ~/.config/email-triage/triage.db --draft-block-list
+```
+
+State is persisted in SQLite (`automation.state_db`) so already-drafted emails are skipped by default.
+`triage.vip_frequency_threshold` controls automatic VIP promotion when a high-priority sender reaches the threshold.
+`mail.sender_emails` matching in either `To` or `Cc` marks an email as high priority in rule-based classification.
+Low/medium-priority emails are auto-archived when configured in `automation.auto_archive_priorities`.
+
+If the launcher/apply cycle reports `errors=1`, re-run one email and inspect DB rows:
+
+```bash
+uv run scripts/triage_cycle.py --apply --limit 1 --reprocess
+sqlite3 ~/.config/email-triage/triage.db \
+  'select email_id,status,error,draft_id,updated_at from triage_state order by updated_at desc limit 5;'
 ```
 
 ## Documentation
 
-- `scripts/README.md` (CLI usage and examples for each script)
-- `docs/jmap-fastmail-setup.md` (complete Fastmail setup and first run)
-- `docs/jmap-automation-reference.md` (command/reference matrix and runbook)
+- [`docs/jmap-fastmail-setup.md`](docs/jmap-fastmail-setup.md) (setup and first run)
+- [`docs/jmap-automation-reference.md`](docs/jmap-automation-reference.md) (command/reference matrix and runbook)
 
 ## Notes
 
-- The default state DB is `~/.config/email-triage/triage.db`.
-- Triaged emails are persisted in the local SQLite database for priority and follow-up history.
+- Default state DB: `~/.config/email-triage/triage.db`.
 - Draft creation remains non-destructive; drafted messages are not sent automatically.
