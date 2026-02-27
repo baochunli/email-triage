@@ -1,6 +1,7 @@
 # JMAP Automation Reference (Source of Truth)
 
 This is the canonical reference for Fastmail JMAP automation behavior.
+
 If command behavior changes, update this file together with:
 - `scripts/run.sh` (launcher help text)
 - `scripts/triage_cycle.py --help`

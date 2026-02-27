@@ -1,6 +1,6 @@
 # Fastmail JMAP Setup Guide
 
-Use this guide if you want the email automation workflow without Apple Mail + AppleScript.
+Use this guide to set up email automation workflow. 
 
 Canonical behavior reference (for ongoing updates): [jmap-automation-reference.md](jmap-automation-reference.md).
 
