@@ -1,0 +1,103 @@
+# Email productivity configuration
+# Default lookup path used by JMAP scripts: ~/.config/email-triage/config.yaml
+
+fastmail:
+  # Generate from Fastmail: Settings -> Privacy & Security -> Integrations -> New API Token
+  api_token: "fm1.REPLACE_ME"
+
+  # Optional overrides (normally auto-discovered from /jmap/session)
+  # session_url: "https://api.fastmail.com/jmap/session"
+  # api_url: "https://api.fastmail.com/jmap/api/"
+  # account_id: "u123456"
+
+mail:
+  # Optional label used in script output
+  account: "Fastmail"
+
+  # Mailbox names used by scripts/jmap/*.py
+  mailbox: "INBOX"
+  sent_mailbox: "Sent"
+  drafts_mailbox: "Drafts"
+  trash_mailbox: "Trash"
+  archive_mailbox: "Archive"
+
+  # Optional sender identity(ies):
+  # - used for draft creation / self-check gating
+  # - any incoming email addressed to one of these (To/Cc) is treated as high priority
+  #sender_emails:
+  #  - "you@example.com"
+  #  - "you+alias@example.com"
+  # sender_name: "Your Name"
+  # sender_email: "you@example.com"  # optional: explicit From address for outbound drafted replies
+
+ai:
+  # Codex backend for intelligent triage/drafting
+  backend: codex
+
+  codex:
+    # subscription | api_key | auto
+    auth_mode: subscription
+    model: gpt-5-codex
+    # none | minimal | low | medium | high | xhigh (provider/model dependent)
+    #reasoning_effort: medium
+    # For subscription mode, authenticate once with: codex login
+    # For api_key mode, set OPENAI_API_KEY or configure api_key/api_key_env
+    api_key_env: OPENAI_API_KEY
+    base_url: https://api.openai.com/v1
+
+automation:
+  # Automated triage + draft pipeline
+  use_codex: true
+  codex_fallback_to_rules: true
+  codex_timeout_seconds: 60
+  codex_max_body_chars: 4000
+  max_emails_per_cycle: 20
+  auto_draft: true
+  draft_actionable_only: true
+  min_priority_for_draft: high   # low | medium | high
+  # Archive by priority: low, medium, and/or high
+  auto_archive_priorities:
+    - low
+    - medium
+  # Legacy compatibility toggle (used when auto_archive_priorities is omitted):
+  #   true => [low, medium], false => []
+  auto_archive_low_priority: true
+  reply_all: true
+  loop_interval_seconds: 900
+  state_db: ~/.config/email-triage/triage.db
+
+triage:
+  # Optional legacy bootstrap list; entries are migrated into DB on first run.
+  #vip_senders:
+  #  - your-boss@example.com
+  #  - important-contact@example.com
+
+  # Keywords that boost priority
+  urgent_keywords:
+    - urgent
+    - deadline
+    - asap
+    - action required
+
+  # After this many high-priority emails, auto-mark sender as VIP
+  vip_frequency_threshold: 5
+
+drafting:
+  signature: |
+    Best,
+    [Your Name]
+  tone: professional
+  style: concise
+
+followup:
+  # Days before generating a follow-up reminder
+  reply_timeout_days: 5
+  # Patterns to exclude from follow-up tracking
+  exclude_patterns:
+    - noreply@
+    - no-reply@
+    - notifications@
+    - donotreply@
+
+storage:
+  directory: ~/.config/email-manager
