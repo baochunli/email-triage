@@ -14,7 +14,7 @@ mail:
   # Optional label used in script output
   account: "Fastmail"
 
-  # Mailbox names used by scripts/jmap/*.py
+  # Mailbox names used by scripts/*.py
   mailbox: "INBOX"
   sent_mailbox: "Sent"
   drafts_mailbox: "Drafts"

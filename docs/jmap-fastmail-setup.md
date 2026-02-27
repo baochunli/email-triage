@@ -53,7 +53,7 @@ The automation pipeline uses Codex via `ai.backend: codex` in config, with optio
 ## 3) Verify connectivity
 
 ```bash
-uv run scripts/jmap/get_mailboxes.py
+uv run scripts/get_mailboxes.py
 ```
 
 Expected output starts with `ACCOUNT:` and mailbox lines.
@@ -63,19 +63,19 @@ Expected output starts with `ACCOUNT:` and mailbox lines.
 Unread inbox emails:
 
 ```bash
-uv run scripts/jmap/fetch_emails.py "Fastmail" "INBOX" 20
+uv run scripts/fetch_emails.py "Fastmail" "INBOX" 20
 ```
 
 Create a reply draft:
 
 ```bash
-uv run scripts/jmap/create_draft.py "<jmap-email-id>" "Thanks — I'll get this done by Friday."
+uv run scripts/create_draft.py "<jmap-email-id>" "Thanks — I'll get this done by Friday."
 ```
 
 Delete (move to Trash):
 
 ```bash
-uv run scripts/jmap/delete_email.py "Fastmail" "INBOX" "<jmap-email-id>"
+uv run scripts/delete_email.py "Fastmail" "INBOX" "<jmap-email-id>"
 ```
 
 ## 5) Run automated triage + drafting
@@ -83,19 +83,19 @@ uv run scripts/jmap/delete_email.py "Fastmail" "INBOX" "<jmap-email-id>"
 Tiny launcher (recommended):
 
 ```bash
-./scripts/jmap/run.sh
-./scripts/jmap/run.sh dry
-./scripts/jmap/run.sh daemon
-./scripts/jmap/run.sh reset-status
+./scripts/run.sh
+./scripts/run.sh dry
+./scripts/run.sh daemon
+./scripts/run.sh reset-status
 ```
 
 Direct commands:
 
 ```bash
-uv run scripts/jmap/triage_cycle.py
-uv run scripts/jmap/triage_cycle.py --apply
-uv run scripts/jmap/daemon.py
-./scripts/jmap/run.sh reset-status --state-db ~/.config/email-triage/triage.db
+uv run scripts/triage_cycle.py
+uv run scripts/triage_cycle.py --apply
+uv run scripts/daemon.py
+./scripts/run.sh reset-status --state-db ~/.config/email-triage/triage.db
 ```
 
 Triage history and state are stored in SQLite at `automation.state_db` (default `~/.config/email-triage/triage.db`).
@@ -103,14 +103,14 @@ Triage history and state are stored in SQLite at `automation.state_db` (default 
 If you see launcher output like `errors=1`, run one explicit cycle and inspect the latest triage rows:
 
 ```bash
-uv run scripts/jmap/triage_cycle.py --apply --limit 1 --reprocess
+uv run scripts/triage_cycle.py --apply --limit 1 --reprocess
 sqlite3 ~/.config/email-triage/triage.db \
   'select email_id,status,error,draft_id,updated_at from triage_state order by updated_at desc limit 5;'
 ```
 
 ## 6) Update your agent instructions
 
-Replace AppleScript command examples with the new `uv run scripts/jmap/...` commands.
+Replace AppleScript command examples with the new `uv run scripts/...` commands.
 
 Recommended guidance:
 - Always create drafts only (never send directly)

@@ -36,21 +36,21 @@ Then set `fastmail.api_token` in that file or export `FASTMAIL_API_TOKEN`.
 ### 3) Run a quick dry run
 
 ```bash
-uv run scripts/jmap/get_mailboxes.py
-uv run scripts/jmap/fetch_emails.py "Fastmail" "INBOX" 5
+uv run scripts/get_mailboxes.py
+uv run scripts/fetch_emails.py "Fastmail" "INBOX" 5
 ```
 
 ### 4) Run triage
 
 ```bash
-uv run scripts/jmap/triage_cycle.py
-uv run scripts/jmap/triage_cycle.py --apply
-uv run scripts/jmap/daemon.py
+uv run scripts/triage_cycle.py
+uv run scripts/triage_cycle.py --apply
+uv run scripts/daemon.py
 ```
 
 ## Documentation
 
-- `scripts/jmap/README.md` (CLI usage and examples for each script)
+- `scripts/README.md` (CLI usage and examples for each script)
 - `docs/jmap-fastmail-setup.md` (complete Fastmail setup and first run)
 - `docs/jmap-automation-reference.md` (command/reference matrix and runbook)
 

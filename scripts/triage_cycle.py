@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 from urllib import error, request
 
-try:  # support both `python scripts/jmap/triage_cycle.py` and package imports
+try:  # support both `python scripts/triage_cycle.py` and package imports
     from common import (
         JMAPClient,
         JMAPError,

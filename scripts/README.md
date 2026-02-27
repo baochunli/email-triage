@@ -54,14 +54,14 @@ Use `--no-codex` if you want rule-only triage.
 ## Primitive commands
 
 ```bash
-uv run scripts/jmap/get_mailboxes.py
-uv run scripts/jmap/fetch_emails.py "Fastmail" "INBOX" 10
-uv run scripts/jmap/fetch_all_emails.py "Fastmail" "INBOX" 50 7
-uv run scripts/jmap/fetch_email_by_id.py "Fastmail" "INBOX" "Mabc123"
-uv run scripts/jmap/fetch_sent.py "Fastmail" "Sent" 20
-uv run scripts/jmap/create_draft.py "Mabc123" "Thanks, I will send this Friday."
-uv run scripts/jmap/create_followup_draft.py "Just checking in" "person@example.com" "Re: Topic" "Original text" "2026-02-26"
-uv run scripts/jmap/delete_email.py "Fastmail" "INBOX" "Mabc123"
+uv run scripts/get_mailboxes.py
+uv run scripts/fetch_emails.py "Fastmail" "INBOX" 10
+uv run scripts/fetch_all_emails.py "Fastmail" "INBOX" 50 7
+uv run scripts/fetch_email_by_id.py "Fastmail" "INBOX" "Mabc123"
+uv run scripts/fetch_sent.py "Fastmail" "Sent" 20
+uv run scripts/create_draft.py "Mabc123" "Thanks, I will send this Friday."
+uv run scripts/create_followup_draft.py "Just checking in" "person@example.com" "Re: Topic" "Original text" "2026-02-26"
+uv run scripts/delete_email.py "Fastmail" "INBOX" "Mabc123"
 ```
 
 ## Automated triage pipeline
@@ -69,57 +69,57 @@ uv run scripts/jmap/delete_email.py "Fastmail" "INBOX" "Mabc123"
 Tiny launcher:
 
 ```bash
-./scripts/jmap/run.sh           # one apply cycle (Codex)
-./scripts/jmap/run.sh dry       # one dry-run cycle
-./scripts/jmap/run.sh daemon    # continuous loop
-./scripts/jmap/run.sh rules     # rule-only apply cycle
-./scripts/jmap/run.sh reset-status # reset triage status to triaged
+./scripts/run.sh           # one apply cycle (Codex)
+./scripts/run.sh dry       # one dry-run cycle
+./scripts/run.sh daemon    # continuous loop
+./scripts/run.sh rules     # rule-only apply cycle
+./scripts/run.sh reset-status # reset triage status to triaged
 ```
 
 Dry-run one cycle (Codex triage + no drafts created):
 
 ```bash
-uv run scripts/jmap/triage_cycle.py
+uv run scripts/triage_cycle.py
 ```
 
 Apply mode (Codex triage + auto-create drafts in Drafts mailbox):
 
 ```bash
-uv run scripts/jmap/triage_cycle.py --apply
+uv run scripts/triage_cycle.py --apply
 ```
 
 Continuous mode:
 
 ```bash
-uv run scripts/jmap/triage_cycle.py --apply --loop-seconds 900
+uv run scripts/triage_cycle.py --apply --loop-seconds 900
 # or
-uv run scripts/jmap/daemon.py
-./scripts/jmap/run.sh reset-status --state-db ~/.config/email-triage/triage.db
+uv run scripts/daemon.py
+./scripts/run.sh reset-status --state-db ~/.config/email-triage/triage.db
 ``` 
 
 Rule-only fallback mode (no Codex API calls):
 
 ```bash
-uv run scripts/jmap/triage_cycle.py --apply --no-codex
+uv run scripts/triage_cycle.py --apply --no-codex
 ```
 
 State is persisted in SQLite (`automation.state_db`) so already-drafted emails are skipped by default.
 VIP senders are also persisted there in a `vip_senders` table. Manage them with:
 
 ```bash
-uv run scripts/jmap/triage_cycle.py --vip-list
-uv run scripts/jmap/triage_cycle.py --vip-add "your-boss@example.com" --vip-add "client-alert@example.com"
-uv run scripts/jmap/triage_cycle.py --vip-remove "old-contact@example.com"
-uv run scripts/jmap/triage_cycle.py --state-db ~/.config/email-triage/triage.db --vip-list
+uv run scripts/triage_cycle.py --vip-list
+uv run scripts/triage_cycle.py --vip-add "your-boss@example.com" --vip-add "client-alert@example.com"
+uv run scripts/triage_cycle.py --vip-remove "old-contact@example.com"
+uv run scripts/triage_cycle.py --state-db ~/.config/email-triage/triage.db --vip-list
 ```
 
 Blocked senders for auto-draft suppression are persisted in the same DB (`draft_blocked_senders`). Manage them with:
 
 ```bash
-uv run scripts/jmap/triage_cycle.py --draft-block-list
-uv run scripts/jmap/triage_cycle.py --draft-block-add "noreply@example.com" --draft-block-add "alerts@example.com"
-uv run scripts/jmap/triage_cycle.py --draft-block-remove "alerts@example.com"
-uv run scripts/jmap/triage_cycle.py --state-db ~/.config/email-triage/triage.db --draft-block-list
+uv run scripts/triage_cycle.py --draft-block-list
+uv run scripts/triage_cycle.py --draft-block-add "noreply@example.com" --draft-block-add "alerts@example.com"
+uv run scripts/triage_cycle.py --draft-block-remove "alerts@example.com"
+uv run scripts/triage_cycle.py --state-db ~/.config/email-triage/triage.db --draft-block-list
 ```
 
 Low and medium-priority emails are auto-archived to the configured Archive mailbox (`mail.archive_mailbox`) when
@@ -134,7 +134,7 @@ rule-based classifier.
 If a launcher/apply run reports `errors=1`, inspect the exact failure:
 
 ```bash
-uv run scripts/jmap/triage_cycle.py --apply --limit 1 --reprocess
+uv run scripts/triage_cycle.py --apply --limit 1 --reprocess
 sqlite3 ~/.config/email-triage/triage.db \
   'select email_id,status,error,draft_id,updated_at from triage_state order by updated_at desc limit 5;'
 ```

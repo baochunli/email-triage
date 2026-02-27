@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 UV_BIN="${UV_BIN:-uv}"
 DAEMON_PID_FILE="${EMAIL_TRIAGE_DAEMON_PID_FILE:-${XDG_RUNTIME_DIR:-$HOME/.local/run}/email-triage/daemon.pid}"
 DAEMON_LOG_FILE="${EMAIL_TRIAGE_DAEMON_LOG_FILE:-${XDG_RUNTIME_DIR:-$HOME/.local/run}/email-triage/daemon.log}"
@@ -111,8 +111,8 @@ status_daemon() {
 from pathlib import Path
 import sys
 
-from scripts.jmap.common import load_config
-from scripts.jmap.triage_cycle import normalize_automation_settings, normalize_ai_settings
+from scripts.common import load_config
+from scripts.triage_cycle import normalize_automation_settings, normalize_ai_settings
 
 config_path = sys.argv[1] or None
 config, _ = load_config(config_path)
@@ -301,8 +301,8 @@ reset_status() {
 from pathlib import Path
 import sys
 
-from scripts.jmap.common import load_config
-from scripts.jmap.triage_cycle import normalize_automation_settings
+from scripts.common import load_config
+from scripts.triage_cycle import normalize_automation_settings
 
 config_path = sys.argv[1] or None
 config, _ = load_config(config_path)
@@ -360,7 +360,7 @@ PY
 usage() {
   cat <<'EOF'
 Usage:
-  ./scripts/jmap/run.sh [mode] [extra-args...]
+  ./scripts/run.sh [mode] [extra-args...]
 
 Modes:
   once          One triage cycle with Codex + draft creation (default)
@@ -376,14 +376,14 @@ Modes:
   help          Show this help
 
 Examples:
-  ./scripts/jmap/run.sh
-  ./scripts/jmap/run.sh dry --limit 10
-  ./scripts/jmap/run.sh daemon --interval-seconds 900
-  ./scripts/jmap/run.sh daemon stop
-  ./scripts/jmap/run.sh daemon status
-  ./scripts/jmap/run.sh reset-status
-  ./scripts/jmap/run.sh --reset-status
-  ./scripts/jmap/run.sh rules --limit 20
+  ./scripts/run.sh
+  ./scripts/run.sh dry --limit 10
+  ./scripts/run.sh daemon --interval-seconds 900
+  ./scripts/run.sh daemon stop
+  ./scripts/run.sh daemon status
+  ./scripts/run.sh reset-status
+  ./scripts/run.sh --reset-status
+  ./scripts/run.sh rules --limit 20
 EOF
 }
 
