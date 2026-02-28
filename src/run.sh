@@ -111,8 +111,8 @@ status_daemon() {
 from pathlib import Path
 import sys
 
-from scripts.common import load_config
-from scripts.triage_cycle import normalize_automation_settings, normalize_ai_settings
+from src.common import load_config
+from src.triage_cycle import normalize_automation_settings, normalize_ai_settings
 
 config_path = sys.argv[1] or None
 config, _ = load_config(config_path)
@@ -301,8 +301,8 @@ reset_status() {
 from pathlib import Path
 import sys
 
-from scripts.common import load_config
-from scripts.triage_cycle import normalize_automation_settings
+from src.common import load_config
+from src.triage_cycle import normalize_automation_settings
 
 config_path = sys.argv[1] or None
 config, _ = load_config(config_path)
@@ -360,7 +360,7 @@ PY
 usage() {
   cat <<'EOF'
 Usage:
-  ./scripts/run.sh [mode] [extra-args...]
+  ./src/run.sh [mode] [extra-args...]
 
 Modes:
   once          One triage cycle with Codex + draft creation (default)
@@ -376,14 +376,14 @@ Modes:
   help          Show this help
 
 Examples:
-  ./scripts/run.sh
-  ./scripts/run.sh dry --limit 10
-  ./scripts/run.sh daemon --interval-seconds 900
-  ./scripts/run.sh daemon stop
-  ./scripts/run.sh daemon status
-  ./scripts/run.sh reset-status
-  ./scripts/run.sh --reset-status
-  ./scripts/run.sh rules --limit 20
+  ./src/run.sh
+  ./src/run.sh dry --limit 10
+  ./src/run.sh daemon --interval-seconds 900
+  ./src/run.sh daemon stop
+  ./src/run.sh daemon status
+  ./src/run.sh reset-status
+  ./src/run.sh --reset-status
+  ./src/run.sh rules --limit 20
 EOF
 }
 

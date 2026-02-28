@@ -3,9 +3,9 @@
 This is the canonical reference for Fastmail JMAP automation behavior.
 
 If command behavior changes, update this file together with:
-- `scripts/run.sh` (launcher help text)
-- `scripts/triage_cycle.py --help`
-- `scripts/daemon.py --help`
+- `src/run.sh` (launcher help text)
+- `src/triage_cycle.py --help`
+- `src/daemon.py --help`
 
 ## Auth modes (Codex)
 
@@ -25,39 +25,39 @@ Reasoning effort is configured under `ai.codex.reasoning_effort`:
 ```bash
 brew install uv   # one-time
 codex login
-./scripts/run.sh
+./src/run.sh
 ```
 
 ## Launcher modes
 
 ```bash
-./scripts/run.sh once          # default: one apply cycle (Codex)
-./scripts/run.sh dry           # one dry-run cycle
-./scripts/run.sh daemon        # continuous apply loop
-./scripts/run.sh daemon-dry    # continuous dry-run loop
-./scripts/run.sh rules         # rule-only one apply cycle
-./scripts/run.sh rules-daemon  # continuous rule-only apply loop
-./scripts/run.sh reset-status  # reset triage state status to triaged
+./src/run.sh once          # default: one apply cycle (Codex)
+./src/run.sh dry           # one dry-run cycle
+./src/run.sh daemon        # continuous apply loop
+./src/run.sh daemon-dry    # continuous dry-run loop
+./src/run.sh rules         # rule-only one apply cycle
+./src/run.sh rules-daemon  # continuous rule-only apply loop
+./src/run.sh reset-status  # reset triage state status to triaged
 ```
 
 ## Direct commands
 
 ```bash
-uv run scripts/triage_cycle.py
-uv run scripts/triage_cycle.py --vip-list
-uv run scripts/triage_cycle.py --vip-add important-contact@example.com
-uv run scripts/triage_cycle.py --vip-remove no-longer-vip@example.com
-uv run scripts/triage_cycle.py --draft-block-list
-uv run scripts/triage_cycle.py --draft-block-add noreply@example.com
-uv run scripts/triage_cycle.py --draft-block-remove noreply@example.com
-uv run scripts/triage_cycle.py --vip-list --state-db /path/to/triage.db
-uv run scripts/triage_cycle.py --draft-block-list --state-db /path/to/triage.db
-uv run scripts/triage_cycle.py --apply
-uv run scripts/triage_cycle.py --apply --no-codex
-uv run scripts/daemon.py
-uv run scripts/daemon.py --dry-run
-uv run scripts/daemon.py --no-codex
-./scripts/run.sh reset-status
+uv run src/triage_cycle.py
+uv run src/triage_cycle.py --vip-list
+uv run src/triage_cycle.py --vip-add important-contact@example.com
+uv run src/triage_cycle.py --vip-remove no-longer-vip@example.com
+uv run src/triage_cycle.py --draft-block-list
+uv run src/triage_cycle.py --draft-block-add noreply@example.com
+uv run src/triage_cycle.py --draft-block-remove noreply@example.com
+uv run src/triage_cycle.py --vip-list --state-db /path/to/triage.db
+uv run src/triage_cycle.py --draft-block-list --state-db /path/to/triage.db
+uv run src/triage_cycle.py --apply
+uv run src/triage_cycle.py --apply --no-codex
+uv run src/daemon.py
+uv run src/daemon.py --dry-run
+uv run src/daemon.py --no-codex
+./src/run.sh reset-status
 ```
 
 ## Drafts guarantee
@@ -84,7 +84,7 @@ Low and medium-priority emails are auto-archived to the configured Archive mailb
 If launcher output shows `errors=1`, run one explicit cycle and inspect state rows:
 
 ```bash
-uv run scripts/triage_cycle.py --apply --limit 1 --reprocess
+uv run src/triage_cycle.py --apply --limit 1 --reprocess
 sqlite3 ~/.config/email-triage/triage.db \
   'select email_id,status,error,draft_id,updated_at from triage_state order by updated_at desc limit 5;'
 ```

@@ -53,7 +53,7 @@ Use the template in `examples/config.yaml.example`.
 uv sync
 
 # Verify JMAP connectivity
-uv run scripts/get_mailboxes.py
+uv run src/get_mailboxes.py
 ```
 
 ## Codex setup (for intelligent triage)
@@ -80,14 +80,14 @@ Canonical behavior reference: [`docs/jmap-automation-reference.md`](docs/jmap-au
 ## Primitive commands
 
 ```bash
-uv run scripts/get_mailboxes.py
-uv run scripts/fetch_emails.py "Fastmail" "INBOX" 10
-uv run scripts/fetch_all_emails.py "Fastmail" "INBOX" 50 7
-uv run scripts/fetch_email_by_id.py "Fastmail" "INBOX" "Mabc123"
-uv run scripts/fetch_sent.py "Fastmail" "Sent" 20
-uv run scripts/create_draft.py "Mabc123" "Thanks, I will send this Friday."
-uv run scripts/create_followup_draft.py "Just checking in" "person@example.com" "Re: Topic" "Original text" "2026-02-26"
-uv run scripts/delete_email.py "Fastmail" "INBOX" "Mabc123"
+uv run src/get_mailboxes.py
+uv run src/fetch_emails.py "Fastmail" "INBOX" 10
+uv run src/fetch_all_emails.py "Fastmail" "INBOX" 50 7
+uv run src/fetch_email_by_id.py "Fastmail" "INBOX" "Mabc123"
+uv run src/fetch_sent.py "Fastmail" "Sent" 20
+uv run src/create_draft.py "Mabc123" "Thanks, I will send this Friday."
+uv run src/create_followup_draft.py "Just checking in" "person@example.com" "Re: Topic" "Original text" "2026-02-26"
+uv run src/delete_email.py "Fastmail" "INBOX" "Mabc123"
 ```
 
 Output marker compatibility is preserved:
@@ -103,38 +103,38 @@ This keeps existing parsing and instruction workflows compatible.
 Tiny launcher:
 
 ```bash
-./scripts/run.sh           # one apply cycle (Codex)
-./scripts/run.sh dry       # one dry-run cycle
-./scripts/run.sh daemon    # continuous loop
-./scripts/run.sh rules     # rule-only apply cycle
-./scripts/run.sh reset-status # reset triage status to triaged
+./src/run.sh           # one apply cycle (Codex)
+./src/run.sh dry       # one dry-run cycle
+./src/run.sh daemon    # continuous loop
+./src/run.sh rules     # rule-only apply cycle
+./src/run.sh reset-status # reset triage status to triaged
 ```
 
 Dry-run one cycle (Codex triage, no drafts):
 
 ```bash
-uv run scripts/triage_cycle.py
+uv run src/triage_cycle.py
 ```
 
 Apply mode (Codex triage + auto-create drafts in Drafts mailbox):
 
 ```bash
-uv run scripts/triage_cycle.py --apply
+uv run src/triage_cycle.py --apply
 ```
 
 Continuous mode:
 
 ```bash
-uv run scripts/triage_cycle.py --apply --loop-seconds 900
+uv run src/triage_cycle.py --apply --loop-seconds 900
 # or
-uv run scripts/daemon.py
-./scripts/run.sh reset-status --state-db ~/.config/email-triage/triage.db
+uv run src/daemon.py
+./src/run.sh reset-status --state-db ~/.config/email-triage/triage.db
 ```
 
 Rule-only fallback mode:
 
 ```bash
-uv run scripts/triage_cycle.py --apply --no-codex
+uv run src/triage_cycle.py --apply --no-codex
 ```
 
 ### VIP and draft-block management
@@ -142,19 +142,19 @@ uv run scripts/triage_cycle.py --apply --no-codex
 VIP senders are managed through the triage DB:
 
 ```bash
-uv run scripts/triage_cycle.py --vip-list
-uv run scripts/triage_cycle.py --vip-add "your-boss@example.com" --vip-add "client-alert@example.com"
-uv run scripts/triage_cycle.py --vip-remove "old-contact@example.com"
-uv run scripts/triage_cycle.py --state-db ~/.config/email-triage/triage.db --vip-list
+uv run src/triage_cycle.py --vip-list
+uv run src/triage_cycle.py --vip-add "your-boss@example.com" --vip-add "client-alert@example.com"
+uv run src/triage_cycle.py --vip-remove "old-contact@example.com"
+uv run src/triage_cycle.py --state-db ~/.config/email-triage/triage.db --vip-list
 ```
 
 Draft suppression list commands:
 
 ```bash
-uv run scripts/triage_cycle.py --draft-block-list
-uv run scripts/triage_cycle.py --draft-block-add "noreply@example.com" --draft-block-add "alerts@example.com"
-uv run scripts/triage_cycle.py --draft-block-remove "alerts@example.com"
-uv run scripts/triage_cycle.py --state-db ~/.config/email-triage/triage.db --draft-block-list
+uv run src/triage_cycle.py --draft-block-list
+uv run src/triage_cycle.py --draft-block-add "noreply@example.com" --draft-block-add "alerts@example.com"
+uv run src/triage_cycle.py --draft-block-remove "alerts@example.com"
+uv run src/triage_cycle.py --state-db ~/.config/email-triage/triage.db --draft-block-list
 ```
 
 State is persisted in SQLite (`automation.state_db`) so already-drafted emails are skipped by default.
@@ -165,7 +165,7 @@ Low/medium-priority emails are auto-archived when configured in `automation.auto
 If the launcher/apply cycle reports `errors=1`, re-run one email and inspect DB rows:
 
 ```bash
-uv run scripts/triage_cycle.py --apply --limit 1 --reprocess
+uv run src/triage_cycle.py --apply --limit 1 --reprocess
 sqlite3 ~/.config/email-triage/triage.db \
   'select email_id,status,error,draft_id,updated_at from triage_state order by updated_at desc limit 5;'
 ```
