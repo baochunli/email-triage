@@ -83,10 +83,10 @@ uv run src/delete_email.py "Fastmail" "INBOX" "<jmap-email-id>"
 Tiny launcher (recommended):
 
 ```bash
-./src/run.sh
-./src/run.sh dry
-./src/run.sh daemon
-./src/run.sh reset-status
+./run.sh
+./run.sh dry
+./run.sh daemon
+./run.sh reset-status
 ```
 
 Direct commands:
@@ -95,7 +95,7 @@ Direct commands:
 uv run src/triage_cycle.py
 uv run src/triage_cycle.py --apply
 uv run src/daemon.py
-./src/run.sh reset-status --state-db ~/.config/email-triage/triage.db
+./run.sh reset-status --state-db ~/.config/email-triage/triage.db
 ```
 
 Triage history and state are stored in SQLite at `automation.state_db` (default `~/.config/email-triage/triage.db`).

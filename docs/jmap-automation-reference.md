@@ -3,7 +3,7 @@
 This is the canonical reference for Fastmail JMAP automation behavior.
 
 If command behavior changes, update this file together with:
-- `src/run.sh` (launcher help text)
+- `run.sh` (launcher help text)
 - `src/triage_cycle.py --help`
 - `src/daemon.py --help`
 
@@ -25,19 +25,19 @@ Reasoning effort is configured under `ai.codex.reasoning_effort`:
 ```bash
 brew install uv   # one-time
 codex login
-./src/run.sh
+./run.sh
 ```
 
 ## Launcher modes
 
 ```bash
-./src/run.sh once          # default: one apply cycle (Codex)
-./src/run.sh dry           # one dry-run cycle
-./src/run.sh daemon        # continuous apply loop
-./src/run.sh daemon-dry    # continuous dry-run loop
-./src/run.sh rules         # rule-only one apply cycle
-./src/run.sh rules-daemon  # continuous rule-only apply loop
-./src/run.sh reset-status  # reset triage state status to triaged
+./run.sh once          # default: one apply cycle (Codex)
+./run.sh dry           # one dry-run cycle
+./run.sh daemon        # continuous apply loop
+./run.sh daemon-dry    # continuous dry-run loop
+./run.sh rules         # rule-only one apply cycle
+./run.sh rules-daemon  # continuous rule-only apply loop
+./run.sh reset-status  # reset triage state status to triaged
 ```
 
 ## Direct commands
@@ -57,7 +57,7 @@ uv run src/triage_cycle.py --apply --no-codex
 uv run src/daemon.py
 uv run src/daemon.py --dry-run
 uv run src/daemon.py --no-codex
-./src/run.sh reset-status
+./run.sh reset-status
 ```
 
 ## Drafts guarantee

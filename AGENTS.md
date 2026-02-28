@@ -5,7 +5,7 @@ This repository is a script-first Python project (no packaged `src/` module). Co
 - `src/common.py`: shared JMAP client/config helpers.
 - `src/triage_cycle.py`: main triage engine and CLI flow.
 - other `src/*.py`: focused mailbox and draft operations.
-- `src/run.sh`: convenience launcher for one-shot and daemon modes.
+- `run.sh`: convenience launcher for one-shot and daemon modes.
 
 Tests live in `tests/` (currently `test_triage_cycle_priority.py`). Reference docs are in `docs/`, and starter configuration is in `examples/config.yaml.example`.
 
@@ -13,7 +13,7 @@ Tests live in `tests/` (currently `test_triage_cycle_priority.py`). Reference do
 - `uv sync`: install/update dependencies from `pyproject.toml` and `uv.lock`.
 - `uv run src/get_mailboxes.py`: verify Fastmail/JMAP connectivity.
 - `uv run src/triage_cycle.py --apply --limit 10`: run one apply cycle on a small batch.
-- `./src/run.sh dry | rules | daemon`: run dry, rule-only, or continuous modes.
+- `./run.sh dry | rules | daemon`: run dry, rule-only, or continuous modes.
 - `uv run python -m unittest discover -s tests -p "test_*.py"`: run the regression test suite.
 
 Run commands from repo root so relative imports and `--project` behavior stay consistent.

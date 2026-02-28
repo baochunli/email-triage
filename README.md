@@ -103,11 +103,11 @@ This keeps existing parsing and instruction workflows compatible.
 Tiny launcher:
 
 ```bash
-./src/run.sh           # one apply cycle (Codex)
-./src/run.sh dry       # one dry-run cycle
-./src/run.sh daemon    # continuous loop
-./src/run.sh rules     # rule-only apply cycle
-./src/run.sh reset-status # reset triage status to triaged
+./run.sh           # one apply cycle (Codex)
+./run.sh dry       # one dry-run cycle
+./run.sh daemon    # continuous loop
+./run.sh rules     # rule-only apply cycle
+./run.sh reset-status # reset triage status to triaged
 ```
 
 Dry-run one cycle (Codex triage, no drafts):
@@ -128,7 +128,7 @@ Continuous mode:
 uv run src/triage_cycle.py --apply --loop-seconds 900
 # or
 uv run src/daemon.py
-./src/run.sh reset-status --state-db ~/.config/email-triage/triage.db
+./run.sh reset-status --state-db ~/.config/email-triage/triage.db
 ```
 
 Rule-only fallback mode:

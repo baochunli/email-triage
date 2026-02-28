@@ -2,7 +2,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+REPO_ROOT="$SCRIPT_DIR"
+SRC_DIR="$SCRIPT_DIR/src"
 UV_BIN="${UV_BIN:-uv}"
 DAEMON_PID_FILE="${EMAIL_TRIAGE_DAEMON_PID_FILE:-${XDG_RUNTIME_DIR:-$HOME/.local/run}/email-triage/daemon.pid}"
 DAEMON_LOG_FILE="${EMAIL_TRIAGE_DAEMON_LOG_FILE:-${XDG_RUNTIME_DIR:-$HOME/.local/run}/email-triage/daemon.log}"
@@ -360,7 +361,7 @@ PY
 usage() {
   cat <<'EOF'
 Usage:
-  ./src/run.sh [mode] [extra-args...]
+  ./run.sh [mode] [extra-args...]
 
 Modes:
   once          One triage cycle with Codex + draft creation (default)
@@ -376,14 +377,14 @@ Modes:
   help          Show this help
 
 Examples:
-  ./src/run.sh
-  ./src/run.sh dry --limit 10
-  ./src/run.sh daemon --interval-seconds 900
-  ./src/run.sh daemon stop
-  ./src/run.sh daemon status
-  ./src/run.sh reset-status
-  ./src/run.sh --reset-status
-  ./src/run.sh rules --limit 20
+  ./run.sh
+  ./run.sh dry --limit 10
+  ./run.sh daemon --interval-seconds 900
+  ./run.sh daemon stop
+  ./run.sh daemon status
+  ./run.sh reset-status
+  ./run.sh --reset-status
+  ./run.sh rules --limit 20
 EOF
 }
 
@@ -439,16 +440,16 @@ fi
 
 case "$mode" in
   once)
-    exec "$UV_BIN" run --project "$REPO_ROOT" "$SCRIPT_DIR/triage_cycle.py" --apply "$@"
+    exec "$UV_BIN" run --project "$REPO_ROOT" "$SRC_DIR/triage_cycle.py" --apply "$@"
     ;;
   dry)
-    exec "$UV_BIN" run --project "$REPO_ROOT" "$SCRIPT_DIR/triage_cycle.py" "$@"
+    exec "$UV_BIN" run --project "$REPO_ROOT" "$SRC_DIR/triage_cycle.py" "$@"
   ;;
   daemon)
     case "${1-}" in
       start)
         shift
-        start_daemon "$UV_BIN" run --project "$REPO_ROOT" "$SCRIPT_DIR/daemon.py" "$@"
+        start_daemon "$UV_BIN" run --project "$REPO_ROOT" "$SRC_DIR/daemon.py" "$@"
         ;;
       status)
         shift
@@ -458,21 +459,21 @@ case "$mode" in
         stop_daemon
         ;;
       ""|--*)
-        start_daemon "$UV_BIN" run --project "$REPO_ROOT" "$SCRIPT_DIR/daemon.py" "$@"
+        start_daemon "$UV_BIN" run --project "$REPO_ROOT" "$SRC_DIR/daemon.py" "$@"
         ;;
       *)
-        start_daemon "$UV_BIN" run --project "$REPO_ROOT" "$SCRIPT_DIR/daemon.py" "$@"
+        start_daemon "$UV_BIN" run --project "$REPO_ROOT" "$SRC_DIR/daemon.py" "$@"
         ;;
     esac
     ;;
   daemon-dry)
-    exec "$UV_BIN" run --project "$REPO_ROOT" "$SCRIPT_DIR/daemon.py" --dry-run "$@"
+    exec "$UV_BIN" run --project "$REPO_ROOT" "$SRC_DIR/daemon.py" --dry-run "$@"
     ;;
   rules)
-    exec "$UV_BIN" run --project "$REPO_ROOT" "$SCRIPT_DIR/triage_cycle.py" --apply --no-codex "$@"
+    exec "$UV_BIN" run --project "$REPO_ROOT" "$SRC_DIR/triage_cycle.py" --apply --no-codex "$@"
     ;;
   rules-daemon)
-    exec "$UV_BIN" run --project "$REPO_ROOT" "$SCRIPT_DIR/daemon.py" --no-codex "$@"
+    exec "$UV_BIN" run --project "$REPO_ROOT" "$SRC_DIR/daemon.py" --no-codex "$@"
     ;;
   reset-status)
     reset_status "$@"
